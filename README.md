@@ -1,8 +1,5 @@
-# Пример сайта (шаблон): 
-      https://mazipan.github.io/bulma-admin-dashboard-template/extras/
 # Ссылка на гит: 
-         https://github.com/mazipan/bulma-admin-dashboard-template.git
-
+         https://github.com/codewithshabbir/Restoran.git
 
 # TaskFlow
 
