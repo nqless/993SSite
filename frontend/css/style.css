@@ -1223,3 +1223,164 @@ body {
 .todo-list.compact {
     max-height: 150px;
 }
+/* =========================================
+   АДАПТАЦИЯ ПОД ПЛАНШЕТЫ И ТЕЛЕФОНЫ (@MEDIA)
+   ========================================= */
+
+/* 1. ПЛАНШЕТЫ И НЕБОЛЬШИЕ НОУТБУКИ (до 1024px) */
+@media (max-width: 1024px) {
+    .stats-grid {
+        grid-template-columns: repeat(2, 1fr);
+    }
+
+    .dashboard-split,
+    .dashboard-bottom-grid,
+    .calendar-layout,
+    .charts-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .wide-card {
+        grid-column: span 1;
+    }
+
+    .main-content {
+        padding: 28px 24px;
+    }
+}
+
+/* 2. СМАРТФОНЫ И УЗКИЕ ЭКРАНЫ (до 768px) */
+@media (max-width: 768px) {
+    /* Стартовый экран */
+    .landing-header {
+        padding: 20px 24px;
+        justify-content: center;
+    }
+
+    .hero-card {
+        padding: 28px 36px;
+        width: 100%;
+        max-width: 340px;
+    }
+
+    .hero-title {
+        font-size: 34px;
+    }
+
+    .landing-hint {
+        text-align: center;
+        font-size: 13px;
+    }
+
+    .modal-box {
+        padding: 24px 20px;
+    }
+
+    /* Перестройка кабинета в мобильный вид */
+    .app-layout {
+        flex-direction: column;
+    }
+
+    .sidebar {
+        width: 100%;
+        border-right: none;
+        border-bottom: 1px solid var(--border-color);
+        padding: 16px 20px;
+        gap: 14px;
+    }
+
+    .sidebar-logo {
+        margin-bottom: 0;
+        justify-content: space-between;
+    }
+
+    .sidebar-section-label,
+    .sidebar-sprint-box,
+    .sidebar-focus-box {
+        display: none;
+    }
+
+    .sidebar-nav {
+        flex-direction: row;
+        overflow-x: auto;
+        gap: 6px;
+        padding-bottom: 4px;
+    }
+
+    .nav-item {
+        flex: 1;
+        text-align: center;
+        padding: 10px 12px;
+        font-size: 14px;
+        white-space: nowrap;
+    }
+
+    .sidebar-footer {
+        flex-direction: row;
+        align-items: center;
+        justify-content: space-between;
+        padding-top: 12px;
+    }
+
+    /* Основной контент на телефоне */
+    .main-content {
+        padding: 20px 16px;
+    }
+
+    .page-header,
+    .flex-between {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 12px;
+    }
+
+    .page-title {
+        font-size: 22px;
+    }
+
+    .stats-grid {
+        grid-template-columns: 1fr;
+        gap: 14px;
+    }
+
+    .card {
+        padding: 18px 16px;
+        border-radius: 14px;
+    }
+
+    .card-header {
+        flex-wrap: wrap;
+        gap: 10px;
+    }
+
+    /* Форма добавления задач и календарь */
+    .todo-add-form {
+        flex-wrap: wrap;
+    }
+
+    .todo-add-form input {
+        width: 100%;
+        flex: none;
+    }
+
+    .todo-add-form select {
+        flex: 1;
+    }
+
+    .calendar-days {
+        gap: 4px;
+    }
+
+    .cal-day {
+        border-radius: 8px;
+        font-size: 13px;
+    }
+
+    .svg-chart-box {
+        height: 210px;
+    }
+
+    .svg-chart-box.tall {
+        height: 230px;
+    }
+}
