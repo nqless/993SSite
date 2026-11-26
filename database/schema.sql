@@ -1,43 +1,63 @@
-/* примерный вариант таблицы SQL (код выдал клод)
+<?php
+session_start();
 
-DROP TABLE IF EXISTS tasks;
-DROP TABLE IF EXISTS project_members;
-DROP TABLE IF EXISTS projects;
-DROP TABLE IF EXISTS users;
+// Подключаем настройки базы данных, которые уже создали твои друзья
+require_once __DIR__ . '/../database.php';
 
-CREATE TABLE users (
-  id INT AUTO_INCREMENT PRIMARY KEY,
-  name VARCHAR(100) NOT NULL,
-  email VARCHAR(255) NOT NULL UNIQUE,
-  password_hash VARCHAR(255) NOT NULL,
-  created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
-);
+$action = $_POST['action'] ?? '';
+$email = trim($_POST['email'] ?? '');
+$password = $_POST['password'] ?? '';
+$fullName = trim($_POST['full_name'] ?? '');
 
-CREATE TABLE projects (
-  id INT AUTO_INCREMENT PRIMARY KEY,
-  title VARCHAR(150) NOT NULL,
-  owner_id INT NOT NULL,
-  created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-  FOREIGN KEY (owner_id) REFERENCES users(id)
-);
+if (empty($email) || empty($password)) {
+    die('Ошибка: заполните email и пароль. <a href="../../index.php">Вернуться</a>');
+}
 
-CREATE TABLE project_members (
-  project_id INT NOT NULL,
-  user_id INT NOT NULL,
-  PRIMARY KEY (project_id, user_id),
-  FOREIGN KEY (project_id) REFERENCES projects(id) ON DELETE CASCADE,
-  FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE
-);
+try {
+    // 1. ЕСЛИ ПОЛЬЗОВАТЕЛЬ НАЖАЛ "SIGN UP" (РЕГИСТРАЦИЯ)
+    if ($action === 'register') {
+        if (empty($fullName)) {
+            die('Ошибка: введите имя пользователя. <a href="../../index.php">Вернуться</a>');
+        }
 
-CREATE TABLE tasks (
-  id INT AUTO_INCREMENT PRIMARY KEY,
-  project_id INT NOT NULL,
-  title VARCHAR(200) NOT NULL,
-  description TEXT,
-  assignee_id INT NULL,
-  status ENUM('todo', 'in_progress', 'done') NOT NULL DEFAULT 'todo',
-  deadline DATE NULL,
-  created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-  FOREIGN KEY (project_id) REFERENCES projects(id) ON DELETE CASCADE,
-  FOREIGN KEY (assignee_id) REFERENCES users(id) ON DELETE SET NULL
-);
+        // Проверяем, не занят ли email
+        $checkStmt = $pdo->prepare('SELECT id FROM users WHERE email = ?');
+        $checkStmt->execute([$email]);
+        if ($checkStmt->fetch()) {
+            die('Этот email уже зарегистрирован! <a href="../../index.php">Войти</a>');
+        }
+
+        // Шифруем пароль и записываем нового пользователя в таблицу users
+        $passwordHash = password_hash($password, PASSWORD_DEFAULT);
+        $insertStmt = $pdo->prepare('INSERT INTO users (full_name, email, password_hash) VALUES (?, ?, ?)');
+        $insertStmt->execute([$fullName, $email, $passwordHash]);
+
+        // Сразу авторизуем и пускаем в кабинет
+        $_SESSION['user_id'] = $pdo->lastInsertId();
+        $_SESSION['full_name'] = $fullName;
+
+        header('Location: ../../frontend/pages/dashboard.php');
+        exit;
+    }
+
+    // 2. ЕСЛИ ПОЛЬЗОВАТЕЛЬ НАЖАЛ "SIGN IN" (ВХОД)
+    if ($action === 'login') {
+        $stmt = $pdo->prepare('SELECT id, full_name, password_hash FROM users WHERE email = ?');
+        $stmt->execute([$email]);
+        $user = $stmt->fetch(PDO::FETCH_ASSOC);
+
+        // Проверяем существование пользователя и сверяем пароль
+        if ($user && password_verify($password, $user['password_hash'])) {
+            $_SESSION['user_id'] = $user['id'];
+            $_SESSION['full_name'] = $user['full_name'];
+
+            header('Location: ../../frontend/pages/dashboard.php');
+            exit;
+        } else {
+            die('Неверный email или пароль! <a href="../../index.php">Попробовать снова</a>');
+        }
+    }
+
+} catch (PDOException $e) {
+    die('Ошибка базы данных: ' . $e->getMessage());
+}
